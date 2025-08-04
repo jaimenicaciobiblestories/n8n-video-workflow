@@ -1,6 +1,8 @@
 name: n8n Video Automation Workflow
 
 on:
+  schedule:
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 jobs:
@@ -27,4 +29,4 @@ jobs:
         run: echo "${{ secrets.N8N_CREDENTIALS_JSON }}" > ~/.n8n/credentials.json
 
       - name: Execute the n8n workflow
-        run: n8n execute --workflow=workflow.json --log-level=debug
+        run: n8n execute --workflow=workflow.json
