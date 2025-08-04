@@ -1,0 +1,35 @@
+name: n8n Video Automation Workflow
+
+on:
+  # This makes the workflow run every 6 hours
+  schedule:
+    - cron: '0 */6 * * *'
+  # This also allows you to run it manually from the GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  run-n8n-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install n8n and FFmpeg
+        run: |
+          npm install -g n8n
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Create n8n data directory
+        run: mkdir -p ~/.n8n
+      
+      - name: Set up n8n credentials
+        run: echo "${{ secrets.N8N_CREDENTIALS_JSON }}" > ~/.n8n/credentials.json
+
+      - name: Execute the n8n workflow
+        run: n8n execute --workflow=workflow.json
+```6.  Scroll down to the bottom and click the green **"Commit changes"** button.
