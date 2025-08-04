@@ -1,32 +1,26 @@
-name: n8n Video Automation Workflow
+name: n8n Docker Workflow
 
 on:
-  schedule:
-    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 jobs:
-  run-n8n-workflow:
+  run-n8n:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      - name: Install n8n and FFmpeg
-        run: |
-          npm install -g n8n
-          sudo apt-get update && sudo apt-get install -y ffmpeg
-
-      - name: Create n8n data directory
+      - name: Create credentials directory
         run: mkdir -p ~/.n8n
-      
-      - name: Set up n8n credentials
-        run: echo "${{ secrets.N8N_CREDENTIALS_JSON }}" > ~/.n8n/credentials.json
 
-      - name: Execute the n8n workflow
-        run: n8n execute --workflow=workflow.json
+      - name: Set up n8n credentials from secret
+        run: echo '${{ secrets.N8N_CREDENTIALS_JSON }}' > ~/.n8n/credentials.json
+
+      - name: Run n8n Docker container and execute workflow
+        run: |
+          docker run --rm \
+            -e N8N_ENCRYPTION_KEY='${{ secrets.N8N_ENCRYPTION_KEY }}' \
+            -v $(pwd):/data \
+            -v ~/.n8n:/home/node/.n8n \
+            n8nio/n8n:latest \
+            n8n execute --workflow=/data/workflow.json --log-level=debug
