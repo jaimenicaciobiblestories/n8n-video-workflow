@@ -1,1 +1,111 @@
-
+{
+  "name": "AI Content Engine - GITHUB FINAL",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        1040
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4-turbo",
+        "prompt": "You are a viral content strategist. Generate ONE trending topic for a YouTube video about making money online. The topic MUST involve at least 3 different income streams from this list: AI tools, freelancing, affiliate marketing, Google SEO, remote jobs, investing. Your output must be ONLY a JSON object with this exact structure: {\"topic\": \"...\", \"income_streams\": [\"...\", \"...\", \"...\"]}"
+      },
+      "name": "1. Topic Generator",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 2,
+      "position": [
+        -740,
+        1040
+      ],
+      "id": "c3d4e5f6-a7b8-9012-3456-7890abcdef12",
+      "credentials": {
+        "openAiApi": {
+          "id": "2",
+          "name": "My OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4-turbo",
+        "prompt": "You are a world-class scriptwriter for a viral, paparazzi-style financial YouTube channel. Your goal is to hook the audience, create drama, and build a loyal community. Use the following topic: {{ $json.content.topic }}\n\nCreate a complete content package. Your output MUST be ONLY a single JSON object with the following exact keys:\n\n{\n  \"motivational_intro\": \"A 15-second, powerful, generic motivational intro speech in the style of a famous entrepreneur (like a Steve Jobs or Elon Musk speech, but not directly impersonating them). It should be about taking action and changing your life.\",\n  \"long_video_script\": \"A 7-10 minute video script. Start with a strong POV hook like 'I saw the lie they were selling...'. Tell a dramatic story. Integrate these income streams: {{ $json.content.income_streams.join(', ') }}. Include an engagement prompt like 'What's the #1 thing holding you back? Comment below, I read every single one!'. Include a teaser hook like 'Stick around to the end, because I'm giving away the exact tool list that jumpstarted everything for me—for free!'. End with a strong CTA to subscribe, comment, and join the Discord community for more secrets.\",\n  \"short_video_script\": \"A 45-60 second, high-impact trailer script from the most dramatic part of the long script. It needs to be punchy, use fast cuts, and create massive curiosity for the full video.\",\n  \"youtube_title\": \"A highly clickable, SEO-friendly YouTube title for the video. Use intrigue, numbers, and drama (e.g., 'The AI Side Hustle They Don't Want You To Know About').\",\n  \"youtube_description\": \"A full YouTube description. Start with a 1-2 sentence summary of the video. Then, you MUST append the following block of links EXACTLY AS WRITTEN, including the emojis and line breaks:\\n\\n--- 🚀 MY TOP RECOMMENDATIONS & FREE GIFTS 🚀 ---\\n\\n🎁 Free Social Media Guide (Already Monetized Profiles):\\nhttps://monetizedprofiles.com/jaime\\n\\n💰 End-of-Year Raffle (Dec 20-26):\\nhttps://24hrcarlocksmith.com/\\n\\n💳 Global Crypto VISA Card (Get $50+ in BTC):\\nhttps://platinum.crypto.com/r/53j2evksrt\\n\\n🛒 10-40% OFF My Amazon Gear:\\nhttps://amzn.to/3TZizpM\\n\\n🤖 The AI Tool That Changed My Business (Get $500):\\nhttps://app.glitchy.ai/sign-up?rid=125273\\n\\n🎬 Pre-Monetized YouTube Channels:\\nhttps://tikaccounts.com/jaime\\n\\n--- JOIN THE COMMUNITY ---\\n\\nJoin our exclusive Discord community: https://discord.gg/YOUR_INVITE_CODE\\n\\nFinally, add a section with 3-5 relevant hashtags.\",\n  \"social_media_caption\": \"A short, punchy caption for TikTok/Instagram/Facebook Reels. End with a strong hook like 'LINK IN BIO for the full story!'. Include #MakeMoneyOnline #AIHustle #SideHustle #FinancialFreedom.\",\n  \"community_post_poll\": \"A poll question for the YouTube Community Tab. It must be a simple multiple-choice question related to the video topic, designed to create debate. (e.g., 'What's the BIGGEST barrier to making money online? A) Lack of knowledge, B) Fear of failure, C) Not enough time, D) Procrastination').\"\n}"
+      },
+      "name": "2. Script Generator",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        1040
+      ],
+      "id": "d4e5f6a7-b8c9-0123-4567-890abcdef123",
+      "credentials": {
+        "openAiApi": {
+          "id": "2",
+          "name": "My OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "title": "={{ $('2. Script Generator').item.json.content.youtube_title }}",
+        "description": "={{ $('2. Script Generator').item.json.content.youtube_description }}"
+      },
+      "name": "Placeholder YouTube Upload",
+      "type": "n8n-nodes-base.youtube",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        1040
+      ],
+      "id": "c9d0e1f2-a3b4-5678-9012-def123456789",
+      "credentials": {
+        "youtubeOAuth2Api": {
+          "id": "1",
+          "name": "My Google Credential"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+        "main": [
+            [
+                {
+                    "node": "1. Topic Generator",
+                    "type": "main",
+                    "index": 0
+                }
+            ]
+        ]
+    },
+    "1. Topic Generator": {
+      "main": [
+        [
+          {
+            "node": "2. Script Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Script Generator": {
+      "main": [
+        [
+          {
+            "node": "Placeholder YouTube Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
